@@ -116,8 +116,8 @@ This course introduces students to tools and techniques commonly used by securit
 | 8 | 4/13 - 4/19 | Web Server Hacking & Database Attacks (continued) | |
 | 9 | 4/20 - 4/26 | **Midterm Project Presentation** | |
 | 10 | 4/27 - 5/3 | Wireless Technologies, Security, and Attacks | |
-| 11 | 5/4 - 5/10 | IDS, Firewall, and Honeypots | |
-| 12 | 5/11 - 5/17 | Buffer Overflows, Virus, and Worms | |
+| 11 | 5/4 - 5/10 | IDS, Firewall, and Honeypots | ⚠️ 停課（補課：6/12 NPU 生成式 AI 論壇）|
+| 12 | 5/11 - 5/17 | Linux Local Privilege Escalation：PackageKit、polkit & TOCTOU（CVE-2026-41651） | |
 | 13 | 5/18 - 5/24 | Physical Security and Social Engineering | |
 | 14 | 5/25 - 5/31 | Comprehensive Attack & Defense Exercises | |
 | 15 | 6/1 - 6/7 | Comprehensive Attack & Defense Exercises (continued) | |
