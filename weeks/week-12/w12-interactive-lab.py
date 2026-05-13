@@ -187,7 +187,7 @@ def phase1():
         print(c("yellow", "  Flag 1 已奪取！"))
         return True
 
-    print(""│
+    print("""│
 挑戰目標：找出導致 Pack2TheRoot 漏洞的 polkit 設定錯誤。
 │
 你將 SSH 進入有漏洞的 container，檢查 polkit 授權規則。
@@ -396,7 +396,7 @@ def phase3():
     print(f"  {r.stdout}")
 
     neg = re.search(r"負數[：:]\s*(\d+)", r.stdout)
-    double = re.search(r"超過[：:]\s*(\d+)", r.stdout)
+    double = re.search(r"執行超過一次[：:]\s*(\d+)", r.stdout)
     neg_count = int(neg.group(1)) if neg else 999
     double_count = int(double.group(1)) if double else 999
 

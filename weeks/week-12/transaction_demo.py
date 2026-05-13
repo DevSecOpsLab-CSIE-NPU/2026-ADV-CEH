@@ -84,28 +84,16 @@ class Transaction:
     # ──────────────────────────────────────────
 
     def safe_execute(self, amount: int) -> bool:
-        """
-        TODO：實作執行緒安全的版本，防止 race condition。
-
-        目標：讓 1000 次並發操作後，balance 不會出現負數，
-              且 execution_count 最多為 1。
-
-        修復方向（三選一）：
-        A. 使用 self.lock（threading.Lock），
-           讓「檢查 state → 扣款」成為不可分割的原子操作
-        B. 使用 compare-and-swap：先確認 state 仍為 AUTHORIZED，
-           才執行扣款，否則直接 return False
-        C. 在 sleep 之後重新讀取並驗證 state，
-           若已不是 AUTHORIZED 則中止
-
-        建議使用 Claude Code / Codex 輔助實作。
-
-        對應到 PackageKit 1.3.5 的修補方向：
-        在 InstallFiles() 加入 state guard，flags 在 authorization
-        時讀取並鎖定，不允許後續修改或 backward transition。
-        """
-        # TODO：實作安全版本
-        return False
+        with self.lock:
+            if self.state != self.AUTHORIZED:
+                return False
+            time.sleep(0.001)
+            if self.state != self.AUTHORIZED:
+                return False
+            self.balance -= amount
+            self.state = self.COMPLETE
+            self.execution_count += 1
+            return True
 
 
 # ──────────────────────────────────────────────
