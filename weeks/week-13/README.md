@@ -77,9 +77,12 @@ opencode 的訓練資料截止日比這個 CVE 還早——它**不知道**這�
 
 ### 4.1 什麼是 Code Smell？
 
-**Code smell** 由 Martin Fowler（《Refactoring》，1999）提出：
+**Code smell** 由 Kent Beck 命名、Martin Fowler 在《Refactoring》（1999）推廣：
 
-> Code smell 不是 bug。它是「表面結構讓你感覺這裡以後會出問題」的徵兆。
+> "A code smell is a surface indication that usually corresponds to a deeper problem in the system."  
+> — Martin Fowler, [martinfowler.com/bliki/CodeSmell.html](https://martinfowler.com/bliki/CodeSmell.html)
+
+Fowler 強調 smell 是**觸發重構的啟示**（heuristic），不保證一定有問題，但「聞起來怪」的地方遲早會出事。完整的 smell 分類目錄見 [refactoring.guru/refactoring/smells](https://refactoring.guru/refactoring/smells)，共分五大類（Bloaters、OO Abusers、Change Preventers、Dispensables、Couplers）。
 
 三個區別：
 
@@ -94,7 +97,44 @@ opencode 的訓練資料截止日比這個 CVE 還早——它**不知道**這�
 - 沒有驗證輸入 → 遲早 injection
 - 密碼寫死在程式碼 → 遲早被翻 git history 撈走
 
-### 4.2 CERT C 規則 = 業界認可的 Smell 清單
+### 4.2 Code Smell 與漏洞的關係：有數據嗎？
+
+有。兩篇近期研究量化了 smell 與漏洞的相關性：
+
+**研究 1：Smell ↔ Vulnerability 相關係數 0.93**
+
+> Gupta, Suri & Vincent（2020）分析多個開源專案，用 SonarCloud 自動偵測 code smell，結果顯示：  
+> **「Code smell 與漏洞配對的相關係數最高達 0.93」**  
+> （[An Empirical Examination of Code Smells and Vulnerabilities](https://www.ijcaonline.org/archives/volume176/number32/31405-2020920362/)）
+
+0.93 幾乎是完全相關——**你聞到 smell，那個地方就很可能有漏洞**。
+
+**研究 2：AI 生成程式碼有多少 security weakness？**
+
+> 2023 年針對 GitHub 上 Copilot 生成程式碼的實証研究（[arxiv.org/abs/2310.02059](https://arxiv.org/abs/2310.02059)）發現：  
+> - **27.3% 的 Copilot 生成程式碼片段含有安全弱點**  
+> - Python 最高：29.5%（419 片段中 124 個有問題）  
+> - 共發現 628 個安全問題，橫跨 43 個 CWE 類別  
+> - Top CWE：CWE-330（亂數不足，18%）、CWE-94（Code Injection，10%）、CWE-79（XSS，10%）
+
+> 補充：Siddiq et al.（SCAM 2022，[zenodo.org/records/7049118](https://zenodo.org/records/7049118)）的研究中，  
+> Copilot 在生成的程式碼裡引入了 **18 種 code smell，其中 2 種是 security smell**。
+
+**這兩個數字是今天課程的核心前提**：你用 opencode 寫的程式碼，平均每 4 份就有 1 份含有安全弱點，而且這些弱點通常都有對應的 smell 可以事先偵測。
+
+### 4.3 Security Code Smell → CWE 的對應
+
+2024 年的研究（[arxiv.org/abs/2411.19358](https://arxiv.org/abs/2411.19358)）整理了 JavaScript 常見 security code smell 與 CWE 的對應，雖然語言是 JS，但概念通用：
+
+| Security Code Smell | 對應 CWE | C 語言類比 |
+|--------------------|---------|-----------|
+| Hard-coded Sensitive Information | CWE-798, CWE-259 | `const char *key = "abc123"` |
+| Dynamic Code Execution | CWE-95, CWE-77 | `system(user_input)` |
+| Empty Catch Blocks | CWE-703, CWE-1069 | `if (err) {}` 空的錯誤處理 |
+| Weak Cryptography | CWE-326, CWE-327 | 用 MD5 做密碼 hash |
+| Insecure File Handling | CWE-434 | TOCTOU（Week 12 的主題）|
+
+### 4.4 CERT C 規則 = 業界認可的 Smell 清單
 
 CMU SEI 整理的 [CERT C Secure Coding Standard](https://wiki.sei.cmu.edu/confluence/display/c/SEI+CERT+C+Coding+Standard) 有 99 條規則，每條對應一個「這樣寫遲早會出問題」的模式。
 
@@ -102,7 +142,7 @@ CMU SEI 整理的 [CERT C Secure Coding Standard](https://wiki.sei.cmu.edu/confl
 
 格式：`規則編號 → CWE 編號 → 真實案例`
 
-### 4.3 AI Agent 在三個層次的表現
+### 4.5 AI Agent 在三個層次的表現
 
 | 層次 | 例子 | opencode 表現 |
 |------|------|--------------|
@@ -357,10 +397,36 @@ A.4 滲透測試中的應用：
 
 ## 十、延伸閱讀
 
+### Code Smell 基礎
+
+- [Martin Fowler — Code Smell (bliki)](https://martinfowler.com/bliki/CodeSmell.html) — 原始定義
+- [Refactoring.Guru — Code Smells 完整目錄](https://refactoring.guru/refactoring/smells) — 五大分類互動式說明
+
+### Code Smell × 安全漏洞（學術研究）
+
+- [Gupta, Suri & Vincent (2020) — Code Smells and Vulnerabilities 相關係數 0.93](https://www.ijcaonline.org/archives/volume176/number32/31405-2020920362/)
+- [Kambhampati et al. (2024) — JavaScript Security Code Smells (24 種，含 CWE 對應)](https://arxiv.org/abs/2411.19358)
+- [Examining the Relationship of Code and Architectural Smells with Vulnerabilities (2020)](https://arxiv.org/abs/2010.15978) — 9 個開源專案、561 版本分析
+
+### AI 生成程式碼的安全性
+
+- [Security Weaknesses of Copilot-Generated Code (2023)](https://arxiv.org/abs/2310.02059) — 27.3% 含安全弱點
+- [Siddiq et al. (SCAM 2022) — Code Smells in Transformer-Based Code Generation](https://zenodo.org/records/7049118) — Copilot 引入 18 種 smell
+- [Schreiber & Tippe (2024) — Security Vulnerabilities in AI-Generated Code: Large-Scale Analysis](https://arxiv.org/abs/2510.26103) — 7,703 份 AI 程式碼跨四種工具
+
+### CERT C 與 CWE
+
 - [SEI CERT C Coding Standard](https://wiki.sei.cmu.edu/confluence/display/c/SEI+CERT+C+Coding+Standard)
 - [CWE Top 25 (MITRE)](https://cwe.mitre.org/top25/)
+- [OWASP Top 10:2025](https://owasp.org/Top10/)
+
+### 本週時事
+
 - [Dirty Frag CVE-2026-43284 — NVD](https://nvd.nist.gov/vuln/detail/CVE-2026-43284)
 - [Grafana TanStack 供應鏈攻擊技術分析 (2026/05/19)](https://grafana.com/blog/2026/05/19/supply-chain-security-incident/)
 - [Pwn2Own Berlin 2026 結果 — ZDI](https://www.zerodayinitiative.com/blog/)
-- [林柏青，安全程式設計（教育部種子教師研習教材）](https://edu.tw) — 本週部分範例來源
+
+### 工具
+
 - [semgrep/skills — Agent Skills for Security](https://github.com/semgrep/skills)
+- [林柏青，安全程式設計（教育部種子教師研習教材）](https://edu.tw) — 本週部分範例來源
