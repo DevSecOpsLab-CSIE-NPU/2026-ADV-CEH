@@ -60,20 +60,7 @@ opencode 的訓練資料截止日比這個 CVE 還早——它**不知道**這�
 
 ---
 
-## 三、課程時間配置
-
-| 時間 | 模組 | 類型 |
-|------|------|------|
-| 0:00–0:20 | Lecture：Code Smell 與 CERT C | 講授 |
-| 0:20–0:55 | Lab 1：opencode 寫密碼驗證 → 找 smell | 個人操作 |
-| 0:55–1:30 | Lab 2：opencode 分析未知 CVE 片段 | 個人操作 |
-| 1:30–1:40 | Break | 休息 |
-| 1:40–2:10 | Lab 3：好指引下的重寫 | 個人操作 |
-| 2:10–3:00 | 報告撰寫與截圖整理 | 個人作業 |
-
----
-
-## 四、Lecture — Code Smell 與 CERT C（20 分鐘）
+## 三、Lecture — Code Smell 與 CERT C
 
 ### 4.1 什麼是 Code Smell？
 
@@ -154,7 +141,7 @@ CMU SEI 整理的 [CERT C Secure Coding Standard](https://cmu-sei.github.io/secu
 
 ---
 
-## 五、Lab 1 — opencode 寫密碼驗證（0:20–0:55）
+## 四、Lab 1 — opencode 寫密碼驗證
 
 ### 學習重點
 
@@ -260,7 +247,7 @@ Grafana TanStack 供應鏈攻擊（2026/05/19），竊取 GitHub token 的那段
 
 ---
 
-## 六、Lab 2 — opencode 分析未知 CVE 片段（0:55–1:30）
+## 五、Lab 2 — opencode 分析未知 CVE 片段
 
 ### 學習重點
 
@@ -272,7 +259,7 @@ Grafana TanStack 供應鏈攻擊（2026/05/19），竊取 GitHub token 的那段
 
 開啟一個**全新**的 opencode session（不要延續 Lab 1）。
 
-把 `dirty-frag-educational.c` 的完整內容貼給 opencode，問三個問題：
+把 [`dirty-frag-educational.c`](https://raw.githubusercontent.com/DevSecOpsLab-CSIE-NPU/2026-ADV-CEH/main/weeks/week-13/dirty-frag-educational.c) 的完整內容貼給 opencode，問三個問題：
 
 **問題 Q1**：
 ```
@@ -324,7 +311,7 @@ Exchange CVE-2026-42897（本週微軟揭露）同樣是「輸入信任邊界沒
 
 ---
 
-## 七、Lab 3 — 好指引下的重寫（1:40–2:10）
+## 六、Lab 3 — 好指引下的重寫
 
 ### 學習重點
 
@@ -403,7 +390,7 @@ Pwn2Own Berlin 2026（2026/05 結束），研究員拿走 130 萬美金，靠的
 
 ---
 
-## 八、繳交說明
+## 七、繳交說明
 
 請依 `lab-report-template.md` 格式，以**繁體中文**撰寫，**每人一份**。
 
@@ -420,7 +407,7 @@ Lab 1、Lab 2、Lab 3 的截圖（1-A、1-B、1-C、2-A、2-B、2-C、3-A、3-B�
 
 ---
 
-## 九、期末 Pen-test 報告連結
+## 八、期末 Pen-test 報告連結
 
 本週 lab 產出直接對應期末報告的**附錄 A：AI Agent 使用紀錄**。
 
@@ -440,7 +427,7 @@ A.4 滲透測試中的應用：
 
 ---
 
-## 十、延伸閱讀
+## 九、延伸閱讀
 
 ### Code Smell 基礎
 
