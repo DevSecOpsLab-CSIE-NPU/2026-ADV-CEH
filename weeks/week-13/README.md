@@ -136,7 +136,7 @@ Fowler 強調 smell 是**觸發重構的啟示**（heuristic），不保證一�
 
 ### 4.4 CERT C 規則 = 業界認可的 Smell 清單
 
-CMU SEI 整理的 [CERT C Secure Coding Standard](https://wiki.sei.cmu.edu/confluence/display/c/SEI+CERT+C+Coding+Standard) 有 99 條規則，每條對應一個「這樣寫遲早會出問題」的模式。
+CMU SEI 整理的 [CERT C Secure Coding Standard](https://cmu-sei.github.io/secure-coding-standards/sei-cert-c-coding-standard/) 有 99 條規則，每條對應一個「這樣寫遲早會出問題」的模式。
 
 本週重點規則見 [cert-c-cheatsheet.md](https://raw.githubusercontent.com/DevSecOpsLab-CSIE-NPU/2026-ADV-CEH/main/weeks/week-13/cert-c-cheatsheet.md)（課堂發下去）。
 
@@ -416,7 +416,7 @@ A.4 滲透測試中的應用：
 
 ### CERT C 與 CWE
 
-- [SEI CERT C Coding Standard](https://wiki.sei.cmu.edu/confluence/display/c/SEI+CERT+C+Coding+Standard)
+- [SEI CERT C Coding Standard](https://cmu-sei.github.io/secure-coding-standards/sei-cert-c-coding-standard/)
 - [CWE Top 25 (MITRE)](https://cwe.mitre.org/top25/)
 - [OWASP Top 10:2025](https://owasp.org/Top10/)
 

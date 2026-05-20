@@ -1,6 +1,6 @@
 # CERT C Secure Coding — 安全程式設計快速對照表
 
-> 課堂版（Week 13 發下去用）。完整版見 [SEI CERT C Coding Standard](https://wiki.sei.cmu.edu/confluence/display/c/SEI+CERT+C+Coding+Standard)
+> 課堂版（Week 13 發下去用）。完整版見 [SEI CERT C Coding Standard](https://cmu-sei.github.io/secure-coding-standards/sei-cert-c-coding-standard/)
 
 ---
 
@@ -73,6 +73,6 @@
 ---
 
 > **參考資料**
-> - [CMU SEI CERT C Coding Standard (wiki)](https://wiki.sei.cmu.edu/confluence/display/c/SEI+CERT+C+Coding+Standard)
+> - [CMU SEI CERT C Coding Standard (wiki)](https://cmu-sei.github.io/secure-coding-standards/sei-cert-c-coding-standard/)
 > - [CWE Top 25 Most Dangerous Software Weaknesses](https://cwe.mitre.org/top25/)
 > - [OWASP Top 10 (2021)](https://owasp.org/Top10/)
