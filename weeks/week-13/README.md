@@ -255,6 +255,12 @@ Grafana TanStack 供應鏈攻擊（2026/05/19），竊取 GitHub token 的那段
 - 練習驗證 AI 答案的可靠性（對照 NVD、CERT 等權威來源）
 - 連結 Week 12 的 TOCTOU 概念到更廣的 race condition 模式
 
+### 背景：這個漏洞長什麼樣子？
+
+[![Dirty Frag demo](https://raw.githubusercontent.com/V4bel/dirtyfrag/master/assets/demo.gif)](https://github.com/V4bel/dirtyfrag)
+
+> 上圖來自 [V4bel/dirtyfrag](https://github.com/V4bel/dirtyfrag)，示範非特權使用者透過此漏洞取得 root shell 的過程。
+
 ### Step 1：丟片段給 opencode（10 分鐘）
 
 開啟一個**全新**的 opencode session（不要延續 Lab 1）。
@@ -453,10 +459,11 @@ A.4 滲透測試中的應用：
 ### 本週時事
 
 - [Dirty Frag CVE-2026-43284 — NVD](https://nvd.nist.gov/vuln/detail/CVE-2026-43284)
+- [V4bel/dirtyfrag — PoC repo（含 demo GIF）](https://github.com/V4bel/dirtyfrag)
 - [Grafana TanStack 供應鏈攻擊技術分析 (2026/05/19)](https://grafana.com/blog/2026/05/19/supply-chain-security-incident/)
 - [Pwn2Own Berlin 2026 結果 — ZDI](https://www.zerodayinitiative.com/blog/)
 
 ### 工具
 
 - [semgrep/skills — Agent Skills for Security](https://github.com/semgrep/skills)
-- [林柏青，安全程式設計（教育部種子教師研習教材）](https://edu.tw) — 本週部分範例來源
+- [林柏青，Network and System Security Lab — 中正大學](https://www.cs.ccu.edu.tw/~pclin/) — 本週 C 語言安全程式設計範例來源
