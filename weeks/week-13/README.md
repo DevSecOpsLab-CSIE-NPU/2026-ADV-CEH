@@ -138,7 +138,7 @@ Fowler 強調 smell 是**觸發重構的啟示**（heuristic），不保證一�
 
 CMU SEI 整理的 [CERT C Secure Coding Standard](https://wiki.sei.cmu.edu/confluence/display/c/SEI+CERT+C+Coding+Standard) 有 99 條規則，每條對應一個「這樣寫遲早會出問題」的模式。
 
-本週重點規則見 `cert-c-cheatsheet.md`（課堂發下去）。
+本週重點規則見 [cert-c-cheatsheet.md](https://raw.githubusercontent.com/DevSecOpsLab-CSIE-NPU/2026-ADV-CEH/main/weeks/week-13/cert-c-cheatsheet.md)（課堂發下去）。
 
 格式：`規則編號 → CWE 編號 → 真實案例`
 
@@ -175,7 +175,7 @@ CMU SEI 整理的 [CERT C Secure Coding Standard](https://wiki.sei.cmu.edu/confl
 
 ### Step 2：用 CERT C cheatsheet 掃 smell（10 分鐘）
 
-拿出 `cert-c-cheatsheet.md`，逐條比對 opencode 的輸出。
+拿出 [cert-c-cheatsheet.md](https://raw.githubusercontent.com/DevSecOpsLab-CSIE-NPU/2026-ADV-CEH/main/weeks/week-13/cert-c-cheatsheet.md)，逐條比對 opencode 的輸出。
 
 找到 smell 後，填入下表（報告用）：
 
@@ -254,7 +254,7 @@ Grafana TanStack 供應鏈攻擊（2026/05/19），竊取 GitHub token 的那段
 | 問題 | 驗證方式 |
 |------|---------|
 | Q1 技術描述是否正確 | 對照程式碼裡的註解 |
-| Q2 是否指出 COW bypass / race condition | 對照 `cert-c-cheatsheet.md` 的 CON30-C、FIO45-C |
+| Q2 是否指出 COW bypass / race condition | 對照 [cert-c-cheatsheet.md](https://raw.githubusercontent.com/DevSecOpsLab-CSIE-NPU/2026-ADV-CEH/main/weeks/week-13/cert-c-cheatsheet.md) 的 CON30-C、FIO45-C |
 | Q3 CVE 是否正確 | 去 [NVD](https://nvd.nist.gov) 搜尋 CVE-2026-43284 |
 
 填入驗證結果：
