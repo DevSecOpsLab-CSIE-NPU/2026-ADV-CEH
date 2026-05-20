@@ -158,58 +158,100 @@ CMU SEI 整理的 [CERT C Secure Coding Standard](https://cmu-sei.github.io/secu
 
 ### 學習重點
 
-- 觀察 opencode 在沒有明確指引時的預設行為
-- 用 CERT C cheatsheet 找出輸出中的 code smell
-- 理解「能跑」和「安全」之間的差距
+- 體驗 TDD 流程：先寫測試、再寫實作
+- 觀察「測試全過」不代表「程式安全」
+- 用 CERT C cheatsheet 找出通過測試但仍存在的 code smell
 
-### Step 1：給 opencode 模糊指引（15 分鐘）
+### TDD 背景：Red → Green → Refactor
+
+Test-Driven Development 的三步驟：
+
+```
+Red    → 先寫測試（此時還沒有實作，測試會失敗）
+Green  → 寫最小實作讓測試通過
+Refactor → 在不改變行為的前提下改善程式碼品質
+```
+
+今天的 lab 聚焦在一個 TDD 常被忽略的盲點：
+**功能測試（functional test）通過 ≠ 安全。**  
+你可以讓所有 assert 都是綠燈，但程式碼仍然充滿 security smell。
+
+### Step 1：TDD Red — 先寫測試（10 分鐘）
 
 開啟 opencode，輸入以下指引（**請逐字輸入，不要加額外說明**）：
 
 ```
-用 C 語言寫一個 verify_password() 函式。
+用 C 語言為 verify_password() 函式寫測試案例（不要寫實作）。
+函式簽名：int verify_password(void);
+測試需求：
+1. 輸入正確密碼時，函式應回傳 1
+2. 輸入錯誤密碼時，函式應回傳 0
+3. 輸入空字串時，函式應回傳 0
+用 assert() 實作這三個測試。
+```
+
+把 opencode 產生的測試程式碼截圖儲存（**截圖 1-A**）。
+
+確認測試符合 Red 階段：此時沒有實作，測試應該無法編譯或執行。
+
+### Step 2：TDD Green — 請 opencode 實作（10 分鐘）
+
+在同一個 opencode session 繼續輸入：
+
+```
+現在幫我實作 verify_password()，讓上面三個測試全部通過。
 需求：
 1. 用 gets() 讀取使用者輸入的密碼
 2. 用 strcmp() 與預設密碼比對
 3. 比對正確回傳 1，錯誤回傳 0
 ```
 
-把 opencode 產生的完整程式碼截圖儲存（**截圖 1-A**）。
+把完整實作程式碼截圖儲存（**截圖 1-B**）。
 
-### Step 2：用 CERT C cheatsheet 掃 smell（10 分鐘）
+觀察重點：**三個 assert 都通過了。但程式安全嗎？**
 
-拿出 [cert-c-cheatsheet.md](https://raw.githubusercontent.com/DevSecOpsLab-CSIE-NPU/2026-ADV-CEH/main/weeks/week-13/cert-c-cheatsheet.md)，逐條比對 opencode 的輸出。
+### Step 3：用 CERT C cheatsheet 掃 smell（10 分鐘）
+
+拿出 [cert-c-cheatsheet.md](https://raw.githubusercontent.com/DevSecOpsLab-CSIE-NPU/2026-ADV-CEH/main/weeks/week-13/cert-c-cheatsheet.md)，逐條比對 opencode 的實作。
 
 找到 smell 後，填入下表（報告用）：
 
-| # | 程式碼位置 | Smell 描述 | CERT 規則 | CWE 編號 | 最壞後果 |
-|---|-----------|-----------|-----------|---------|---------|
-| 1 | | | | | |
-| 2 | | | | | |
-| 3 | | | | | |
+| # | 程式碼位置 | Smell 描述 | CERT 規則 | CWE 編號 | 最壞後果 | 測試有沒有抓到？ |
+|---|-----------|-----------|-----------|---------|---------|---------------|
+| 1 | | | | | | |
+| 2 | | | | | | |
+| 3 | | | | | | |
 
-**至少找出 3 個 smell**。常見的有（不要直接抄，自己找）：
+注意最後一欄：**測試有沒有抓到這個 smell？** 這是今天最重要的觀察。
 
-- 使用了危險的輸入函式（STR07-C / STR31-C）
-- 密碼以明文 `strcmp` 比對（MSC41-C + timing attack 問題）
-- magic number 或寫死的常數（MSC41-C）
-- 錯誤訊息可能洩漏資訊（ERR07-C）
+常見的 smell（不要直接抄，自己找）：
 
-### Step 3：請 opencode 自審（10 分鐘）
+- `gets()` 沒有長度限制（STR31-C / STR07-C）— 測試的三個 case 能抓到這個問題嗎？
+- `strcmp()` 明文比對（MSC41-C）+ timing attack — 測試能測出 timing 差異嗎？
+- magic number（密碼 buffer 大小寫死）— 測試案例會不會剛好在界內？
+- 錯誤訊息洩漏（ERR07-C）— 測試有沒有驗證錯誤訊息的內容？
 
-在同一個 opencode session 繼續輸入：
+### Step 4：請 opencode 自審（5 分鐘）
+
+繼續在同一個 session 輸入：
 
 ```
 請從 CERT C Secure Coding Standard 的角度 review 你剛才寫的程式碼，
 找出所有安全問題。
 ```
 
-把 opencode 的自審結果截圖（**截圖 1-B**）。
+把自審結果截圖（**截圖 1-C**）。
 
-**比較**：
+**三方比較**：
 
-- opencode 自審找到的問題 vs 你找到的問題——哪些重疊？哪些它漏掉了？
-- opencode 自審漏掉的問題，通常是它「會犯但不會察覺」的盲點
+| | 功能測試（assert）| opencode 自審 | 你用 CERT C 掃到的 |
+|--|-----------------|--------------|-------------------|
+| gets() buffer overflow | | | |
+| strcmp() timing attack | | | |
+| 寫死的常數 | | | |
+| 錯誤訊息洩漏 | | | |
+
+**核心結論**：TDD 的功能測試抓不到 security smell——測試是針對「行為」設計的，smell 是「實作品質」的問題。**安全測試要另外設計。**
 
 這個差距就是**你的附加價值**——學會看出 AI agent 的盲點。
 
@@ -368,13 +410,13 @@ Pwn2Own Berlin 2026（2026/05 結束），研究員拿走 130 萬美金，靠的
 | 項目 | 要求 |
 |------|------|
 | 格式 | 依 template 填寫，存成 `.docx` |
-| 截圖 | 截圖 1-A、1-B、2-A、2-B、2-C、3-A、3-B 必附 |
+| 截圖 | 截圖 1-A、1-B、1-C、2-A、2-B、2-C、3-A、3-B 必附 |
 | 檔名 | `W13_Code_Smell_學號_姓名.docx` |
 | 截止 | 上課當週週日 23:59 |
 
 **評分方式**：有繳、截圖完整即可得分。
 
-Lab 1、Lab 2、Lab 3 的截圖（1-A、1-B、2-A、2-B、2-C、3-A、3-B）**缺任何一張不給分**。
+Lab 1、Lab 2、Lab 3 的截圖（1-A、1-B、1-C、2-A、2-B、2-C、3-A、3-B）**缺任何一張不給分**。
 
 ---
 
