@@ -37,8 +37,8 @@ if (strcmp(Password, "Sys!stemCrack"))
 這支程式的問題（CERT STR31-C 違規）從 1988 年的 Morris Worm 就存在，至今仍然：
 
 - opencode 可能寫出相同的錯誤（訓練資料就是這樣寫）
-- Grafana TanStack 供應鏈攻擊（2026/05/19）的起點同樣是「信任輸入」
-- 7-Eleven 60 萬筆 Salesforce 外洩（2026/04）的根源也是「應用層信任邊界沒劃好」
+- [Grafana TanStack 供應鏈攻擊（2026/05/11 發現）](https://grafana.com/blog/grafana-labs-security-update-latest-on-tanstack-npm-supply-chain-ransomware-incident/)的起點同樣是「信任輸入」
+- [7-Eleven 60 萬筆 Salesforce 外洩（2026/04/08）](https://www.bleepingcomputer.com/news/security/7-eleven-confirms-data-breach-claimed-by-the-shinyhunters-gang/)的根源也是「應用層信任邊界沒劃好」
 
 **核心命題**：不是語言在更新，是思維沒有更新。AI agent 會重複人類的錯誤。
 
@@ -243,7 +243,7 @@ Refactor → 在不改變行為的前提下改善程式碼品質
 這個差距就是**你的附加價值**——學會看出 AI agent 的盲點。
 
 **時事扣連**：
-Grafana TanStack 供應鏈攻擊（2026/05/19），竊取 GitHub token 的那段程式碼據分析也是「能跑、通過 review、但有隱性 smell」的風格。**供應鏈攻擊的難點正是在此：不是明顯的 bug，是隱藏的信任假設。**
+[Grafana TanStack 供應鏈攻擊](https://grafana.com/blog/grafana-labs-security-update-latest-on-tanstack-npm-supply-chain-ransomware-incident/)（2026/05/11 發現），竊取 GitHub token 的那段程式碼據分析也是「能跑、通過 review、但有隱性 smell」的風格。**供應鏈攻擊的難點正是在此：不是明顯的 bug，是隱藏的信任假設。**
 
 ---
 
@@ -460,7 +460,9 @@ A.4 滲透測試中的應用：
 
 - [Dirty Frag CVE-2026-43284 — NVD](https://nvd.nist.gov/vuln/detail/CVE-2026-43284)
 - [V4bel/dirtyfrag — PoC repo（含 demo GIF）](https://github.com/V4bel/dirtyfrag)
-- [Grafana TanStack 供應鏈攻擊技術分析 (2026/05/19)](https://grafana.com/blog/2026/05/19/supply-chain-security-incident/)
+- [Grafana TanStack 供應鏈攻擊 — Grafana 官方說明](https://grafana.com/blog/grafana-labs-security-update-latest-on-tanstack-npm-supply-chain-ransomware-incident/)
+- [Grafana TanStack 供應鏈攻擊 — BleepingComputer](https://www.bleepingcomputer.com/news/security/grafana-breach-caused-by-missed-token-rotation-after-tanstack-attack/)
+- [7-Eleven Salesforce 外洩確認 — BleepingComputer](https://www.bleepingcomputer.com/news/security/7-eleven-confirms-data-breach-claimed-by-the-shinyhunters-gang/)
 - [Pwn2Own Berlin 2026 結果 — ZDI](https://www.zerodayinitiative.com/blog/)
 
 ### 工具
