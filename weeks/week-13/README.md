@@ -167,8 +167,11 @@ CMU SEI 整理的 [CERT C Secure Coding Standard](https://cmu-sei.github.io/secu
 開啟 opencode，輸入以下指引（**請逐字輸入，不要加額外說明**）：
 
 ```
-用 C 語言實作一個密碼驗證功能。
-使用者輸入密碼，與預設密碼比對，正確回傳 true，錯誤回傳 false。
+用 C 語言寫一個 verify_password() 函式。
+需求：
+1. 用 gets() 讀取使用者輸入的密碼
+2. 用 strcmp() 與預設密碼比對
+3. 比對正確回傳 1，錯誤回傳 0
 ```
 
 把 opencode 產生的完整程式碼截圖儲存（**截圖 1-A**）。
