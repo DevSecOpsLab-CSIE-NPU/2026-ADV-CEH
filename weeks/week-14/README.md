@@ -2,7 +2,7 @@
 
 **日期**：2026/06/01–06/07
 **時長**：3 小時（180 分鐘）
-**主題**：對 Juice Shop 進行授權滲透，並依 NIST SP 800-86 建立完整鑑識證據鏈
+**主題**：對 Juice Shop 進行授權滲透，並依 [NIST SP 800-86](https://csrc.nist.gov/publications/detail/sp/800-86/final) 建立完整鑑識證據鏈
 **目標系統**：[OWASP Juice Shop](https://github.com/juice-shop/juice-shop)（Docker 容器）
 
 [TOC]
@@ -11,13 +11,13 @@
 
 ## 引言：為什麼是今天？
 
-OWASP Top 10 2025 剛出爐：**A01 Broken Access Control 連續蟬聯第一**，測試資料顯示 **100% 的應用程式**都存在某種 access control 問題。不是 90%，是 100%。
+[OWASP Top 10 2025](https://owasp.org/Top10/) 剛出爐：**A01 Broken Access Control 連續蟬聯第一**，測試資料顯示 **100% 的應用程式**都存在某種 access control 問題。不是 90%，是 100%。
 
 這週兩個真實 CVE 進一步說明這件事不只是排行榜數字——
 
 ---
 
-### A01:2025 — Broken Access Control 仍是 OWASP Top 10 第一名
+### [A01:2025 — Broken Access Control](https://owasp.org/Top10/A01_2025-Broken_Access_Control/) 仍是 OWASP Top 10 第一名
 
 > 今天你們在 Juice Shop 改 basket、看別人訂單、繞過權限，看起來像 CTF；但 OWASP 2025 仍把 Broken Access Control 放第一名，表示這不是玩具漏洞，而是最常見、最實際的 Web AppSec 問題之一。
 
@@ -30,9 +30,9 @@ OWASP Top 10 2025 剛出爐：**A01 Broken Access Control 連續蟬聯第一**�
 
 ---
 
-### CVE-2025-54236 — Adobe Commerce / Magento：SessionReaper
+### [CVE-2025-54236](https://nvd.nist.gov/vuln/detail/CVE-2025-54236) — Adobe Commerce / Magento：SessionReaper
 
-Adobe Commerce 與 Magento Open Source 存在 **Improper Input Validation**，攻擊者可透過 Web API 達成 **session takeover**，不需要使用者互動。NVD 的 CVSS v3.1 向量顯示：網路可利用、低複雜度、不需任何權限。
+Adobe Commerce 與 Magento Open Source 存在 **Improper Input Validation**，攻擊者可透過 Web API 達成 **session takeover**，不需要使用者互動。[NVD](https://nvd.nist.gov/vuln/detail/CVE-2025-54236) 的 CVSS v3.1 向量顯示：網路可利用、低複雜度、不需任何權限。
 
 兩者都是電商情境——Juice Shop 是縮小版的練習場，Magento 是真實的生產環境。漏洞類型幾乎相同。
 
@@ -47,7 +47,7 @@ Adobe Commerce 與 Magento Open Source 存在 **Improper Input Validation**，�
 
 ---
 
-### CVE-2026-26980 — Ghost CMS：Content API SQL Injection
+### [CVE-2026-26980](https://nvd.nist.gov/vuln/detail/CVE-2026-26980) — Ghost CMS：Content API SQL Injection
 
 Ghost CMS 3.24.0 到 6.19.0 的 Content API 存在 **unauthenticated SQL injection**，攻擊者無需認證即可透過 API filter 參數讀取資料庫內容，修補版本為 6.19.1。
 
@@ -62,7 +62,7 @@ Ghost CMS 3.24.0 到 6.19.0 的 Content API 存在 **unauthenticated SQL injecti
 
 **課堂討論**：在 Finding 裡，SQLi 的證據要證明什麼？是「我能 dump 整個 DB」，還是「未授權查詢可以改變資料庫回應」就足夠？
 
-引導方向：Pentest 報告不需要過度擷取資料；**最小侵入證據**能證明風險即可，這也是 NIST SP 800-86 對比例原則的要求。
+引導方向：Pentest 報告不需要過度擷取資料；**最小侵入證據**能證明風險即可，這也是 [NIST SP 800-86](https://csrc.nist.gov/publications/detail/sp/800-86/final) 對比例原則的要求。
 
 ---
 
@@ -173,7 +173,7 @@ http://localhost:3000/#/score-board
 
 ## 三、為什麼今天的主軸是「保存證據」
 
-### 3.1 NIST SP 800-86 的立場
+### 3.1 [NIST SP 800-86](https://csrc.nist.gov/publications/detail/sp/800-86/final) 的立場
 
 > *Guide to Integrating Forensic Techniques into Incident Response*（2006，仍是現行標準）
 
@@ -186,9 +186,9 @@ NIST 強調這份指引**不是只給執法單位**，而是給所有需要處�
 | 重現性（Reproducibility）| 客戶或第三方可以用同樣的步驟得到同樣的結果 |
 | 文件化（Documentation）| 每個動作都要留書面記錄，不能只靠記憶 |
 
-### 3.2 OWASP WSTG 的立場
+### 3.2 [OWASP WSTG](https://owasp.org/www-project-web-security-testing-guide/) 的立場
 
-Web Security Testing Guide 指出：
+[Web Security Testing Guide](https://owasp.org/www-project-web-security-testing-guide/) 指出：
 > *「技術測試只是 assessment 的一半，另一半是清楚的報告。沒有清楚的報告，測試就沒有商業價值。」*
 
 Finding 單不只是技術描述，要包含**業務影響**——客戶的管理階層要看得懂。
@@ -625,9 +625,9 @@ cp reports/finding-template.md reports/finding-03-bruteforce.md
 ## Finding #01 — SQL Injection on Login Endpoint
 
 **Risk**        : Critical
-**CVSS 3.1**    : 9.8 (AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H)
-**OWASP**       : A03:2021 Injection
-**WSTG-INPV-05**: Testing for SQL Injection
+**CVSS 3.1**    : [9.8 (AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H)](https://www.first.org/cvss/calculator/3.1#AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H)
+**OWASP**       : [A03:2021 Injection](https://owasp.org/Top10/A03_2021-Injection/)
+**WSTG-INPV-05**: [Testing for SQL Injection](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/05-Testing_for_SQL_Injection)
 
 ### Technical Description
 ...（說明漏洞原理）
