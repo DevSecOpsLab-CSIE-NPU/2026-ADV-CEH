@@ -301,20 +301,23 @@ ev_start "nikto" "http://localhost:3000" "initial black-box web vulnerability sc
 ### Step 2：ev_cmd — 記錄 How（在執行前）
 
 ```bash
-ev_cmd "nikto -h http://localhost:3000 -output $EV_RAW -Format txt"
+ev_cmd "nikto -h http://localhost:3000 -Tuning b234 -timeout 3 -maxtime 5m -output $EV_RAW -Format txt"
 ```
 
 ### Step 3：執行 nikto — 產生 What
 
 ```bash
 nikto -h http://localhost:3000 \
+  -Tuning b234 \
+  -timeout 3 \
+  -maxtime 5m \
   -output "$EV_RAW" \
   -Format txt
 
 echo "[+] nikto 完成"
 ```
 
-> nikto 掃 Juice Shop 約需 5–10 分鐘，等待時先讀「為什麼 nikto 找到的東西算證據？」
+> `-Tuning b234`：只跑 Software Identification、Misconfiguration、Information Disclosure、Injection 四類，排除對 Juice Shop 無意義的測試。`-maxtime 5m` 確保最多 5 分鐘結束，無論掃描進度如何。
 
 **nikto 的每一行 `+` 開頭輸出都是一個潛在發現**，但它是工具的判斷，不是你的判斷。你的工作是：
 1. 保存原始輸出（What）
