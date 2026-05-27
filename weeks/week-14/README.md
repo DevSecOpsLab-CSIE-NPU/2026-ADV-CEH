@@ -240,7 +240,7 @@ cd "$PENTEST_DIR"
 
 ### 4.3 載入你自己的 Evidence 腳本
 
-> **課前作業**：請依 `evidence-guidelines.md` 的規格書，自行實作一份 `evidence_<學號>.sh`，
+> **課前作業**：請依 [evidence-guidelines.md](evidence-guidelines.md) 的規格書，自行實作一份 `evidence_<學號>.sh`，
 > 上課前一天繳交，課堂直接使用。
 
 ```bash
