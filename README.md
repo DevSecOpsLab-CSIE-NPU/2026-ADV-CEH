@@ -120,9 +120,9 @@ This course introduces students to tools and techniques commonly used by securit
 | 12 | 5/11 - 5/17 | Linux Local Privilege Escalation：PackageKit、polkit & TOCTOU（CVE-2026-41651） | |
 | 13 | 5/18 - 5/24 | Physical Security and Social Engineering | |
 | 14 | 5/25 - 5/31 | Comprehensive Attack & Defense Exercises | |
-| 15 | 6/1 - 6/7 | Comprehensive Attack & Defense Exercises (continued) | |
-| 16 | 6/8 - 6/14 | Penetration Testing Exercises | |
-| 17 | 6/15 - 6/21 | Penetration Testing Exercises (continued) | |
+| 15 | 6/8 - 6/14 | DVWA 完整滲透測試 × Pentest Report（Executive Summary + Findings） | |
+| 16 | 6/8 - 6/14 | （同 Week 15，DVWA 實作延伸）| |
+| 17 | 6/15 - 6/21 | 期末報告撰寫（課堂時間開放） | |
 | 18 | 6/22 - 6/28 | **Final Project Presentation** | |
 
 ---
