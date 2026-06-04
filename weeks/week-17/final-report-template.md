@@ -67,6 +67,7 @@ docker run -d --name juice-shop -p 3000:3000 bkimminich/juice-shop:latest
 - [OWASP Web Security Testing Guide（WSTG）](https://owasp.org/www-project-web-security-testing-guide/)
 - [OWASP Top 10 2021](https://owasp.org/www-top-10/)
 - [CVSS v3.1](https://www.first.org/cvss/calculator/3.1)
+- [NIST SP 800-86](https://csrc.nist.gov/publications/detail/sp/800-86/final)（證據完整性、可追溯性、重現性）
 
 **測試工具：**
 
@@ -87,10 +88,24 @@ docker run -d --name juice-shop -p 3000:3000 bkimminich/juice-shop:latest
   ↓
 漏洞利用（取得證據：位置 + 步驟 + payload + 截圖）
   ↓
+證據保存（NIST SP 800-86 鑑識證據鏈：ev_start → ev_cmd → ev_end，自動時間戳 + SHA-256）
+  ↓
 風險評估（CVSS 3.1 + Business Impact）
   ↓
 修補建議
 ```
+
+**證據保存作法（沿用 Week 14）：**
+
+本次測試的每個漏洞，證據均以 Week 14 自製的 `evidence_<學號>.sh` 收集，遵循 NIST SP 800-86 的 5W1H + Integrity 框架：
+
+- **When**：每次操作的 UTC 時間戳（記錄於 `metadata.json`）
+- **Where**：目標 URL / 參數 / Docker container ID
+- **Who / How**：操作者、工具版本、完整指令（`command_log.txt`）
+- **What**：工具原始輸出與截圖，存於 `evidence/<序號>_<標籤>_<時間戳>/`
+- **Integrity**：`ev_end` 對證據目錄所有檔案計算 SHA-256，並於 `logs/EVIDENCE_INDEX.md` 自動附加一列
+
+完整證據清單見**附錄 D**，所有 SHA-256 可用 `sha256sum -c sha256.txt` 獨立驗證。
 
 ---
 
@@ -135,11 +150,22 @@ HTTP 方法：GET ／ POST
 
 > 截圖說明：圖中顯示（說明截圖內容，例如：「payload 輸入後伺服器回傳了 admin 的密碼雜湊」）
 
-### 4.1.5 風險說明（Business Impact）
+### 4.1.5 證據保存對應
+
+| 項目 | 內容 |
+|------|------|
+| 證據目錄 | `evidence/01_dvwa_sqli_20260615_______/` |
+| 取得時間（UTC） | （metadata.json 的 `when.start_utc`） |
+| 執行指令 | （command_log.txt 第一行） |
+| SHA-256（raw 前 16 碼） | `________________…` |
+
+> 完整紀錄見附錄 D；本筆證據可用 `sha256sum -c evidence/01_dvwa_sqli_.../sha256.txt` 驗證。
+
+### 4.1.6 風險說明（Business Impact）
 
 （用非技術語言說明：攻擊者能做什麼？對實際業務的影響？）
 
-### 4.1.6 修補建議
+### 4.1.7 修補建議
 
 1.（具體建議）
 2.（具體建議）
@@ -162,9 +188,13 @@ HTTP 方法：GET ／ POST
 
 ### 4.2.4 截圖佐證
 
-### 4.2.5 風險說明
+### 4.2.5 證據保存對應
 
-### 4.2.6 修補建議
+（證據目錄 + 取得時間 + 指令 + SHA-256 前 16 碼，格式同 4.1.5）
+
+### 4.2.6 風險說明
+
+### 4.2.7 修補建議
 
 ---
 
@@ -207,6 +237,10 @@ HTTP 方法：GET ／ POST
 （截圖一：攻擊成功畫面）
 
 （截圖二：Scoreboard 截圖，需顯示 URL `/#/score-board` 且該 challenge 旁有 🏆）
+
+### 證據保存對應
+
+（證據目錄 + 取得時間 + 指令 + SHA-256 前 16 碼，格式同 4.1.5；Scoreboard 截圖一併存入該證據目錄）
 
 ### 風險說明
 
@@ -278,3 +312,19 @@ docker inspect dvwa --format '{{.Image}}'
 ```
 
 （貼上輸出）
+
+## 附錄 D — 證據保存清單（EVIDENCE_INDEX）
+
+> 沿用 [Week 14](../week-14/README.md) 的 NIST SP 800-86 鑑識證據鏈。將打靶過程中 `evidence_<學號>.sh` 自動維護的 `logs/EVIDENCE_INDEX.md` 完整貼於此處，讓每個漏洞都能對應到一筆可驗證的證據。
+
+| # | Label | Start (UTC) | Target | Operator / Tool | Command | SHA-256 (raw) |
+|---|-------|-------------|--------|-----------------|---------|---------------|
+| 01 | dvwa_sqli | 2026-06-15T__:__:__Z | http://localhost/dvwa/... | kali / sqlmap | sqlmap -u ... | `________________…` |
+| 02 | | | | | | |
+| 03 | | | | | | |
+
+**驗證方式：**
+```bash
+# 對任一筆證據驗證完整性，應全部顯示 OK
+sha256sum -c evidence/01_dvwa_sqli_*/sha256.txt
+```

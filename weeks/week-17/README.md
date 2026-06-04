@@ -91,7 +91,7 @@ Juice Shop → 6–7 個低星 challenge（1–3 星），每個附 Scoreboard �
 五、修補建議彙整
 六、結論
 七、參考資料
-附錄（截圖、Scoreboard、證據）
+附錄（截圖、Scoreboard、證據保存清單 EVIDENCE_INDEX）
 ```
 
 詳細格式見 [final-report-template.md](final-report-template.md)。
@@ -154,7 +154,58 @@ curl -s "http://localhost/dvwa/vulnerabilities/sqli/?id=1'+OR+'1'='1'--+&Submit=
 
 ---
 
-## 六、Juice Shop Scoreboard 截圖規範
+## 六、證據保存（沿用 Week 14 鑑識證據鏈）
+
+期末報告不只是「打得到」，還要「證明得了」。本次報告的每個漏洞，**證據都要沿用 [Week 14](../week-14/README.md) 建立的 NIST SP 800-86 鑑識證據鏈作法**——截圖不是孤立的圖片，而是可追溯、可驗證完整性的證據。
+
+### 6.1 為什麼要保存證據（[NIST SP 800-86](https://csrc.nist.gov/publications/detail/sp/800-86/final)）
+
+> 一份只有截圖、沒有時間戳與雜湊的證據，在真實 pentest 報告裡是站不住腳的——你無法證明它「什麼時候、對哪個目標、用什麼指令」取得，也無法證明它事後沒被竄改。
+
+沿用 Week 14 的 **5W1H + Integrity** 框架，每份證據都要能回答：
+
+| 問題 | 要保存的內容 | 對應 NIST |
+|------|------------|----------|
+| **When** | 取得時間（UTC）、系統時區 | Traceability |
+| **Where** | URL、參數、Docker container ID / image SHA | Traceability |
+| **Who** | 操作者、工具名稱與版本 | Traceability |
+| **How** | 完整指令、payload、wordlist 名稱 | Reproducibility |
+| **What** | 原始回應、截圖、log 內容 | Documentation |
+| **Integrity** | SHA-256、含 timestamp 的不可變檔名、`EVIDENCE_INDEX.md` | Integrity |
+
+### 6.2 直接重用 Week 14 的 `evidence_<學號>.sh`
+
+Week 14 課前已要求每人依 [evidence-guidelines.md](../week-14/evidence-guidelines.md) 自製一份 `evidence_<學號>.sh`（提供 `ev_start` / `ev_cmd` / `ev_end`）。**期末報告打靶時請直接 source 同一份腳本**，不需重寫：
+
+```bash
+export PENTEST_DIR=~/labs/final
+mkdir -p "$PENTEST_DIR"/{evidence,logs,reports}
+source ~/labs/week14/evidence_<學號>.sh
+
+# 每打一個漏洞，跑一輪 ev_start → ev_cmd → 工具 → ev_end
+ev_start "dvwa_sqli" "http://localhost/dvwa/vulnerabilities/sqli/" "final report - SQLi"
+ev_cmd "sqlmap -u 'http://localhost/dvwa/vulnerabilities/sqli/?id=1&Submit=Submit' --cookie='PHPSESSID=xxx; security=low' --batch --dump --output-dir $EV_DIR/sqlmap_out"
+sqlmap -u 'http://localhost/dvwa/vulnerabilities/sqli/?id=1&Submit=Submit' \
+  --cookie='PHPSESSID=xxx; security=low' --batch --dump --output-dir "$EV_DIR/sqlmap_out"
+ev_end
+```
+
+`ev_end` 會自動：對 `$EV_DIR` 內所有檔案計算 SHA-256、補上結束時間、在 `logs/EVIDENCE_INDEX.md` 附加一列。
+
+> **截圖也是證據**：把每個漏洞的截圖（含 Juice Shop Scoreboard）存進對應的 `$EV_DIR/`，這樣截圖會一起被 `ev_end` 算進 SHA-256，與該次操作的時間戳、指令綁在一起。
+
+### 6.3 報告裡要怎麼呈現
+
+1. **每個漏洞節**：在「截圖佐證」下方加一行證據對應，例如
+   `證據目錄：03_dvwa_sqli_20260615_142233／SHA-256（raw 前16碼）：a3f1b2c4d5e6f789…`
+2. **附錄**：把整份 `EVIDENCE_INDEX.md` 貼進報告附錄（見 [final-report-template.md](final-report-template.md) 附錄 D），讓助教能逐筆對照漏洞與證據。
+3. **可驗證**：保留 `evidence/` 目錄，必要時助教可用 `sha256sum -c sha256.txt` 驗證證據未被竄改。
+
+> **加分提示**：完整的證據鏈（時間戳 + SHA-256 + EVIDENCE_INDEX）對應「重現步驟與截圖清晰，可由他人獨立複現」的品質加分（4 分）。
+
+---
+
+## 七、Juice Shop Scoreboard 截圖規範
 
 Scoreboard URL：`http://localhost:3000/#/score-board`
 
@@ -184,7 +235,7 @@ Scoreboard URL：`http://localhost:3000/#/score-board`
 
 ---
 
-## 七、自我驗收 Checklist
+## 八、自我驗收 Checklist
 
 報告輸出 PDF 前，逐項確認：
 
@@ -216,6 +267,15 @@ Scoreboard URL：`http://localhost:3000/#/score-board`
 - [ ] 有 CVSS 3.1 分數
 - [ ] 有 Business Impact（非技術語言）
 - [ ] 有修補建議（至少 1 條）
+- [ ] 有證據對應（證據目錄名稱 + SHA-256 前 16 碼）
+
+### 證據保存（沿用 Week 14）
+
+- [ ] 打靶時有 source `evidence_<學號>.sh`，每個漏洞跑過 `ev_start → ev_cmd → ev_end`
+- [ ] 截圖存進對應 `$EV_DIR/`，與時間戳、指令一起被算入 SHA-256
+- [ ] `logs/EVIDENCE_INDEX.md` 每個漏洞都有一列（無空白列、SHA-256 由腳本自動計算）
+- [ ] 報告附錄貼上完整 `EVIDENCE_INDEX.md`
+- [ ] 保留 `evidence/` 目錄，可用 `sha256sum -c` 驗證
 
 ### Juice Shop 專項
 
@@ -230,7 +290,7 @@ Scoreboard URL：`http://localhost:3000/#/score-board`
 
 ---
 
-## 八、輸出 PDF + 繳交
+## 九、輸出 PDF + 繳交
 
 ```
 檔名：FINAL_Pentest_學號_姓名.pdf
@@ -240,7 +300,7 @@ Scoreboard URL：`http://localhost:3000/#/score-board`
 
 ---
 
-## 九、注意事項
+## 十、注意事項
 
 - 嚴禁攻擊校外或他人真實系統，違者以**零分**計
 - 抄襲、共用報告依校規處理
